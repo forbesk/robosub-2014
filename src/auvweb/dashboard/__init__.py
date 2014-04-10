@@ -5,5 +5,5 @@ dashboard = Blueprint("dashboard", __name__,
         template_folder="templates")
 
 @dashboard.route("/")
-def index():
+def main():
     return render_template("index.html")
