@@ -13,32 +13,27 @@ public class Agent implements Runnable {
 	}
 	
 	public void run() {
-		
-		new Thread() {
-			public void run() {
-				while(currentTask != null) {
-					
-					currentTask.setModel(model);
-					
-					Thread t = new Thread(currentTask);
-					t.start();
-					
-					synchronized(currentTask) {
-						if(!currentTask.isComplete()) {
-							try {
-								wait();
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
-						}
+
+		while(currentTask != null) {
+
+			currentTask.setModel(model);
+
+			Thread t = new Thread(currentTask);
+			t.start();
+
+			synchronized(currentTask) {
+				if(!currentTask.isComplete()) {
+					try {
+						currentTask.wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
-					
-					currentTask = currentTask.getNextTask();
 				}
 			}
-		}.start();
-		
-		
+
+			currentTask = currentTask.getNextTask();
+		}
+
 	}
 	
 }

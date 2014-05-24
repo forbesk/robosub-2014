@@ -10,11 +10,12 @@ public class DriveTask extends Task {
 	
 	public DriveTask( double setDepth, int duration ) {
 		this.setDepth = setDepth;
-		this.duration = duration;
+		this.duration = duration; // In milliseconds
 	}
 
 	@Override
 	public void run() {
+		state = TaskState.RUNNING;
 		
 		long startTime = System.currentTimeMillis();
 		while(System.currentTimeMillis() < startTime + duration) {
@@ -32,7 +33,7 @@ public class DriveTask extends Task {
 		model.heaveLeft.stop();
 		model.heaveRight.stop();
 		
-		succeeded = true;
+		state = TaskState.SUCCEEDED;
 		cleanup();
 	}
 

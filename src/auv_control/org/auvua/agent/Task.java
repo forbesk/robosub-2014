@@ -8,10 +8,8 @@ public abstract class Task implements Runnable {
 	public Task successTask = null;
 	public Task failureTask = null;
 	public Task timeoutTask = null;
+	public TaskState state = TaskState.NOTSTARTED;
 	public boolean completed = false;
-	public boolean succeeded = false;
-	public boolean failed = false;
-	public boolean timedOut = false;
 	
 	@Override
 	abstract public void run();
@@ -19,7 +17,7 @@ public abstract class Task implements Runnable {
 	protected void cleanup() {
 		synchronized(this) {
 			completed = true;
-			notifyAll();
+			this.notifyAll();
 		}
 	}
 	
@@ -40,14 +38,25 @@ public abstract class Task implements Runnable {
 	}
 	
 	public Task getNextTask() {
-		if(succeeded) return successTask;
-		if(failed) return failureTask;
-		if(timedOut) return timeoutTask;
-		return null;
+		switch(state) {
+			case SUCCEEDED: return successTask;
+			case FAILED:    return failureTask;
+			case TIMEDOUT:  return timeoutTask;
+			default:   return null;
+		}
 	}
 	
 	public boolean isComplete() {
 		return completed;
+	}
+	
+	public enum TaskState {
+		SUCCEEDED,
+		FAILED,
+		TIMEDOUT,
+		INTERRUPTED,
+		RUNNING,
+		NOTSTARTED
 	}
 	
 }
