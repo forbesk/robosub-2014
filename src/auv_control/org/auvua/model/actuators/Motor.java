@@ -4,6 +4,8 @@ public class Motor {
 	
 	private final int id;
 	private double speed;
+	public static double FULLFORWARD = 1.0;
+	public static double FULLBACKWARD = 1.0;
 	
 	public Motor( int id ) {
 		this.id = id;
@@ -18,6 +20,10 @@ public class Motor {
 	
 	public double getSpeed() {
 		return speed;
+	}
+	
+	public void stop() {
+		speed = 0;
 	}
 	
 	public int getId() {
