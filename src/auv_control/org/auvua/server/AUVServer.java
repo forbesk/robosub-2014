@@ -15,7 +15,7 @@ public class AUVServer {
 		
 	public static void main(String args[]) {
 		Model model = new Model();
-		Agent agent = new Agent( model, new DriveTask(60.0, 5000));
+		Agent agent = new Agent( model, new DriveTask(60.0, 10000));
 		
 		new Thread(agent).start();
 		
