@@ -14536,6 +14536,21 @@ Source: www.kingbright.com</description>
 </nets>
 </sheet>
 </sheets>
+<errors>
+<approved hash="104,1,33.02,45.72,IC1,VDD,+5V,,,"/>
+<approved hash="104,1,88.9,45.72,IC1,VSS,GND,,,"/>
+<approved hash="104,1,-22.86,38.1,IC2P,VSS,GND,,,"/>
+<approved hash="104,1,-22.86,53.34,IC2P,VDD,+5V,,,"/>
+<approved hash="115,1,-99.2971,61.0912,JP1,,,,,"/>
+<approved hash="115,1,-99.2971,33.1512,JP2,,,,,"/>
+<approved hash="115,1,126.763,101.731,JP3,,,,,"/>
+<approved hash="115,1,175.023,101.731,JP4,,,,,"/>
+<approved hash="115,1,32.7829,101.731,JP5,,,,,"/>
+<approved hash="115,1,121.047,0,X2,,,,,"/>
+<approved hash="115,1,73.8971,-10.0288,JP6,,,,,"/>
+<approved hash="115,1,142.562,105.41,PWR,,,,,"/>
+<approved hash="115,1,190.822,105.41,MOTOR,,,,,"/>
+</errors>
 </schematic>
 </drawing>
 </eagle>
