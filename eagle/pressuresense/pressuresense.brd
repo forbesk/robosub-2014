@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="6.4">
+<eagle version="6.5.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -15,7 +15,7 @@
 <layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="yes"/>
 <layer number="20" name="Dimension" color="15" fill="1" visible="yes" active="yes"/>
 <layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="22" name="bPlace" color="7" fill="1" visible="no" active="yes"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="yes"/>
 <layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="yes"/>
 <layer number="25" name="tNames" color="7" fill="1" visible="yes" active="yes"/>
@@ -62,9 +62,13 @@
 <wire x1="0" y1="25.4" x2="0" y2="0" width="0" layer="20"/>
 <hole x="3.175" y="3.175" drill="3.7973"/>
 <hole x="22.225" y="22.225" drill="3.7973"/>
-<text x="6.731" y="22.225" size="1.143" layer="21" rot="R135" align="center-left">GND</text>
-<text x="4.953" y="20.447" size="1.143" layer="21" rot="R135" align="center-left">OUT</text>
-<text x="3.175" y="18.669" size="1.143" layer="21" rot="R135" align="center-left">+5V</text>
+<text x="14.986" y="22.352" size="1.143" layer="22" ratio="10" rot="MR45" align="center-left">GND</text>
+<text x="14.097" y="21.463" size="1.143" layer="22" ratio="10" rot="MR45" align="center-left">OUT</text>
+<text x="13.208" y="20.574" size="1.143" layer="22" ratio="10" rot="MR45" align="center-left">+5V</text>
+<text x="4.826" y="9.271" size="0.889" layer="22" ratio="10" rot="MR135">R1</text>
+<text x="24.257" y="4.953" size="1.524" layer="22" ratio="10" rot="MR0">AUVUA</text>
+<text x="24.257" y="2.667" size="1.27" layer="22" ratio="10" rot="MR0">pressure sensor</text>
+<text x="24.257" y="0.762" size="1.27" layer="22" ratio="10" rot="MR0">rev 6.10.14</text>
 </plain>
 <libraries>
 <library name="custom">
@@ -1437,31 +1441,25 @@ design rules under a new name.</description>
 </autorouter>
 <elements>
 <element name="IC1" library="custom" package="MPXA4250AC6U" value="" x="12.551209375" y="12.65641875" smashed="yes" rot="R45">
-<attribute name="NAME" x="19.581978125" y="10.14723125" size="0.8128" layer="21" rot="R45"/>
+<attribute name="NAME" x="19.581978125" y="10.14723125" size="0.889" layer="21" ratio="10" rot="R45"/>
 </element>
 <element name="JP1" library="pinhead" package="1X03" value="" x="6.35" y="19.05" smashed="yes" rot="R45">
-<attribute name="NAME" x="10.598803125" y="21.7398875" size="0.8128" layer="25" ratio="10" rot="R135"/>
 <attribute name="VALUE" x="5.900984375" y="14.11085625" size="1.27" layer="27" rot="R45"/>
 </element>
 <element name="C1" library="resistor" package="C0805K" value="1uF" x="17.070603125" y="4.11660625" smashed="yes" rot="R315">
-<attribute name="NAME" x="17.3632125" y="5.18843125" size="0.8128" layer="25" rot="R315"/>
+<attribute name="NAME" x="17.3632125" y="5.18843125" size="0.889" layer="25" ratio="10" rot="R315"/>
 <attribute name="VALUE" x="15.019990625" y="3.480209375" size="1.016" layer="27" rot="R315"/>
 </element>
 <element name="C2" library="resistor" package="C0805K" value="0.01uF" x="19.05" y="6.096" smashed="yes" rot="R315">
-<attribute name="NAME" x="19.342609375" y="7.167825" size="0.8128" layer="25" rot="R315"/>
+<attribute name="NAME" x="19.342609375" y="7.167825" size="0.889" layer="25" ratio="10" rot="R315"/>
 <attribute name="VALUE" x="16.9993875" y="5.459603125" size="1.016" layer="27" rot="R315"/>
 </element>
 <element name="C3" library="resistor" package="C0805K" value="470pF" x="21.02939375" y="8.075396875" smashed="yes" rot="R315">
-<attribute name="NAME" x="21.322003125" y="9.147221875" size="0.8128" layer="25" rot="R315"/>
+<attribute name="NAME" x="21.322003125" y="9.147221875" size="0.889" layer="25" ratio="10" rot="R315"/>
 <attribute name="VALUE" x="18.97878125" y="7.439" size="1.016" layer="27" rot="R315"/>
 </element>
-<element name="R1" library="resistor" package="R0805" value="220" x="4.593790625" y="12.446" smashed="yes" rot="MR315">
-<attribute name="NAME" x="4.2871875" y="13.449234375" size="0.8128" layer="26" rot="MR315"/>
-<attribute name="VALUE" x="6.749053125" y="11.36836875" size="1.27" layer="28" rot="MR315"/>
-</element>
-<element name="LED1" library="led" package="CHIP-LED0805" value="" x="2.97360625" y="14.171396875" smashed="yes" rot="MR225">
-<attribute name="VALUE" x="5.667684375" y="13.27336875" size="1.27" layer="28" rot="MR315"/>
-</element>
+<element name="R1" library="resistor" package="R0805" value="220" x="4.593790625" y="10.922" rot="MR315"/>
+<element name="LED1" library="led" package="CHIP-LED0805" value="" x="2.97360625" y="12.647396875" rot="MR225"/>
 </elements>
 <signals>
 <signal name="VOUT">
@@ -1487,7 +1485,7 @@ design rules under a new name.</description>
 <contactref element="LED1" pad="A"/>
 <wire x1="18.342890625" y1="6.80310625" x2="16.36349375" y2="4.8237125" width="0.254" layer="1"/>
 <wire x1="19.376203125" y1="17.598203125" x2="19.376203125" y2="17.685359375" width="0.254" layer="1"/>
-<wire x1="3.71606875" y1="14.91385625" x2="3.71606875" y2="16.41606875" width="0.254" layer="16"/>
+<wire x1="3.71606875" y1="13.38985625" x2="3.71606875" y2="16.41606875" width="0.254" layer="16"/>
 <wire x1="3.71606875" y1="16.41606875" x2="4.553946875" y2="17.253946875" width="0.254" layer="16"/>
 <wire x1="18.342890625" y1="6.80310625" x2="13.588996875" y2="11.557" width="0.254" layer="1"/>
 <wire x1="13.588996875" y1="11.557" x2="13.462" y2="11.683996875" width="0.254" layer="1"/>
@@ -1503,7 +1501,7 @@ design rules under a new name.</description>
 <contactref element="C2" pad="2"/>
 <contactref element="C3" pad="2"/>
 <contactref element="R1" pad="1"/>
-<polygon width="0.4064" layer="16">
+<polygon width="0.254" layer="16">
 <vertex x="-0.762" y="26.162"/>
 <vertex x="26.67" y="26.162"/>
 <vertex x="26.67" y="-0.508"/>
@@ -1522,8 +1520,8 @@ design rules under a new name.</description>
 <signal name="N$1">
 <contactref element="LED1" pad="C"/>
 <contactref element="R1" pad="2"/>
-<wire x1="2.231146875" y1="13.428934375" x2="2.408771875" y2="13.428934375" width="0.254" layer="16"/>
-<wire x1="2.408771875" y1="13.428934375" x2="3.99275" y2="11.84495625" width="0.254" layer="16"/>
+<wire x1="2.231146875" y1="11.904934375" x2="2.408771875" y2="11.904934375" width="0.254" layer="16"/>
+<wire x1="2.408771875" y1="11.904934375" x2="3.99275" y2="10.32095625" width="0.254" layer="16"/>
 </signal>
 </signals>
 </board>
