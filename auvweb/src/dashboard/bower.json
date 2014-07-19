@@ -1,0 +1,22 @@
+{
+  "name": "dashboard",
+  "version": "0.0.0",
+  "homepage": "https://github.com/AUV-UA/robosub-2014",
+  "authors": [
+    "Evan Briones <erbriones@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "react": "~0.10.0",
+    "requirejs": "~2.1.11",
+    "backbone": "~1.1.2",
+    "jquery": "~2.1.0"
+  }
+}

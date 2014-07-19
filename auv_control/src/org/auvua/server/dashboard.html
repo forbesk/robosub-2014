@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+	<head>
+		<style type="text/css">
+			.row {
+				clear: left;
+			}
+			
+			.row label {
+				float: left;
+				width: 150px;
+				text-align: right;
+			}
+			
+			.data {
+				display: block;
+				margin-left: 150px;
+				padding-left: 5px;
+			}
+		</style>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<script> 
+				var dashws;
+				var dashwsmsg;
+				
+				$(function() {
+					console.log("Creating AUV dashboard websocket...");
+					dashws = new WebSocket("ws://localhost:8080/dashboard");
+					dashws.onopen = function() { };
+					dashws.onmessage = function(event) {
+						dashwsmsg = JSON.parse(event.data);
+						
+						$("#wsid").text(dashwsmsg.wsid);
+						$("#missionswitch").text(dashwsmsg.missionswitch);
+						$("#killswitch").text(dashwsmsg.killswitch);
+						$("#heading").text(dashwsmsg.heading);
+						$("#depth").text(dashwsmsg.depth);
+						$("#surgeleft").text(dashwsmsg.surgeleft);
+						$("#surgeright").text(dashwsmsg.surgeright);
+						$("#heaveleft").text(dashwsmsg.heaveleft);
+						$("#heaveright").text(dashwsmsg.heaveright);
+						$("#sway").text(dashwsmsg.sway);
+					};
+				});
+		</script>
+	</head>
+	<body>
+		<div class="row">
+			<label>WebSocket ID: </label>
+			<div class="data" id="wsid"></div>
+		</div>
+		<div class="row">
+			<label>Mission switch: </label>
+			<div class="data" id="missionswitch"></div>
+		</div>
+		<div class="row">
+			<label>Kill switch: </label>
+			<div class="data" id="killswitch"></div>
+		</div>
+		<div class="row">
+			<label>Heading: </label>
+			<div class="data" id="heading"></div>
+		</div>
+		<div class="row">
+			<label>Depth: </label>
+			<div class="data" id="depth"></div>
+		</div>
+		<div class="row">
+			<label>Surge Left Thruster: </label>
+			<div class="data" id="surgeleft"></div>
+		</div>
+		<div class="row">
+			<label>Surge Right Thruster: </label>
+			<div class="data" id="surgeright"></div>
+		</div>
+		<div class="row">
+			<label>Heave Left Thruster: </label>
+			<div class="data" id="heaveleft"></div>
+		</div>
+		<div class="row">
+			<label>Heave Right Thruster: </label>
+			<div class="data" id="heaveright"></div>
+		</div>
+		<div class="row">
+			<label>Sway Thruster: </label>
+			<div class="data" id="sway"></div>
+		</div>
+	</body>
+</html>
