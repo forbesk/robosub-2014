@@ -67,7 +67,7 @@ var TelemetryInfo = React.createClass({
         return (
             <div className="col-md-4">
                 <table className="table">
-                    <th colSpan={2}>"Telemetry Info"</th>
+                    <th colSpan={2}>Telemetry Info</th>
                     {rows}
                 </table>
             </div>

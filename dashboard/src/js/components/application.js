@@ -10,6 +10,9 @@ var Application = React.createClass({
         return (
             <div id="container">
                 <Header status={"running"} />
+                <div className="wrapper">
+                    <Telemetry />
+                </div>
                 <Footer />
             </div>
         );
