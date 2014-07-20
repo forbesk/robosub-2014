@@ -4,11 +4,9 @@ import org.auvua.model.Model;
 
 public class Agent implements Runnable {
 	
-	public Model model;
 	public Task currentTask;
 	
-	public Agent( Model model, Task task ) {
-		this.model = model;
+	public Agent( Task task ) {
 		this.currentTask = task;
 	}
 	

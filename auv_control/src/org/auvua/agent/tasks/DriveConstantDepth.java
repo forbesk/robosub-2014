@@ -37,7 +37,7 @@ public class DriveConstantDepth extends Task {
 		long currTime = startTime;
 		
 		do {
-			model.getState();
+			Model.getInstance().getState();
 			long timeStep = currTime - lastTime;
 			
 			surgeLeftControl.advanceTimestep(timeStep);
@@ -45,7 +45,7 @@ public class DriveConstantDepth extends Task {
 			heaveLeftControl.advanceTimestep(timeStep);
 			heaveRightControl.advanceTimestep(timeStep);
 
-			model.setState();
+			Model.getInstance().setState();
 			lastTime = currTime;
 			currTime = System.currentTimeMillis();
 		} while(currTime < startTime + duration);

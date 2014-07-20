@@ -38,11 +38,11 @@ public class MockHardware {
 		long deltaT = currTime - lastTime;
 		// TODO Auto-generated method stub
 		Map<String,Object> robot = Model.getInstance().getRobot();
-		double surgeLeft = (double) Model.getComponentValue("hardware.surgeLeft.speed", robot) * 100;
-		double surgeRight = (double) Model.getComponentValue("hardware.surgeRight.speed", robot) * 100;
-		double heaveLeft = (double) Model.getComponentValue("hardware.heaveLeft.speed", robot) * 100;
-		double heaveRight = (double) Model.getComponentValue("hardware.heaveRight.speed", robot) * 100;
-		double sway = (double) Model.getComponentValue("hardware.sway.speed", robot) * 40;
+		double surgeLeft = (double) Model.getInstance().getComponentValue("hardware.surgeLeft.speed") * 100;
+		double surgeRight = (double) Model.getInstance().getComponentValue("hardware.surgeRight.speed") * 100;
+		double heaveLeft = (double) Model.getInstance().getComponentValue("hardware.heaveLeft.speed") * 100;
+		double heaveRight = (double) Model.getInstance().getComponentValue("hardware.heaveRight.speed") * 100;
+		double sway = (double) Model.getInstance().getComponentValue("hardware.sway.speed") * 40;
 		
 		force[0] = (surgeLeft + surgeRight);
 		force[1] = sway;

@@ -23,25 +23,10 @@ public class DashboardEndpoint {
 			@Override
 			public void run() {
 				while(true) {
-					JSONObject jsonmsg = new JSONObject();
-					
-					Model model = Model.getInstance();
-					
-					// Add variables to message here
-					jsonmsg.put("surgeleft", new Double(model.surgeLeft.getSpeed()));
-					jsonmsg.put("surgeright", new Double(model.surgeRight.getSpeed()));
-					jsonmsg.put("heaveleft", new Double(model.heaveLeft.getSpeed()));
-					jsonmsg.put("heaveright", new Double(model.heaveRight.getSpeed()));
-					jsonmsg.put("sway", new Double(model.sway.getSpeed()));
-					jsonmsg.put("missionswitch", new Boolean(model.missionSwitch.getState()));
-					jsonmsg.put("killswitch", new Boolean(model.killSwitch.getState()));
-					jsonmsg.put("heading", new Double(model.compass.getHeading()));
-					jsonmsg.put("depth", new Double(model.depthGauge.getDepth()));
-					
+					JSONObject jsonmsg = new JSONObject(Model.getInstance().getRobot());
+
 					for(Session peer : peers) {
-						// Add peer-specific variables to message here
-						jsonmsg.put("wsid", peer.getId());
-						
+												
 						try {
 							peer.getBasicRemote().sendText(jsonmsg.toJSONString());
 						} catch (IOException e) {

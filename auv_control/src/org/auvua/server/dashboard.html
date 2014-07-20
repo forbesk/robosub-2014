@@ -29,26 +29,22 @@
 					dashws.onopen = function() { };
 					dashws.onmessage = function(event) {
 						dashwsmsg = JSON.parse(event.data);
+						var hw = dashwsmsg.hardware;
 						
-						$("#wsid").text(dashwsmsg.wsid);
-						$("#missionswitch").text(dashwsmsg.missionswitch);
-						$("#killswitch").text(dashwsmsg.killswitch);
-						$("#heading").text(dashwsmsg.heading);
-						$("#depth").text(dashwsmsg.depth);
-						$("#surgeleft").text(dashwsmsg.surgeleft);
-						$("#surgeright").text(dashwsmsg.surgeright);
-						$("#heaveleft").text(dashwsmsg.heaveleft);
-						$("#heaveright").text(dashwsmsg.heaveright);
-						$("#sway").text(dashwsmsg.sway);
+						$("#missionswitch").text(hw.missionSwitch.on);
+						$("#killswitch").text(hw.killSwitch.on);
+						$("#heading").text(hw.compass.heading);
+						$("#depth").text(hw.depthGauge.depth);
+						$("#surgeleft").text(hw.surgeLeft.speed);
+						$("#surgeright").text(hw.surgeRight.speed);
+						$("#heaveleft").text(hw.heaveLeft.speed);
+						$("#heaveright").text(hw.heaveRight.speed);
+						$("#sway").text(hw.sway.speed);
 					};
 				});
 		</script>
 	</head>
 	<body>
-		<div class="row">
-			<label>WebSocket ID: </label>
-			<div class="data" id="wsid"></div>
-		</div>
 		<div class="row">
 			<label>Mission switch: </label>
 			<div class="data" id="missionswitch"></div>

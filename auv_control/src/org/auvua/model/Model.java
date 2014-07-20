@@ -8,12 +8,18 @@ import org.auvua.model.sensors.Compass;
 import org.auvua.model.sensors.DepthGauge;
 import org.auvua.model.sensors.Switch;
 import org.auvua.sim.MockHardware;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.zeromq.*;
+import org.zeromq.ZMQ.*;
 
 public class Model {
 	
 	private Map<String,Object> robot = new HashMap<String,Object>();
 	
 	private static final Model instance = new Model();
+	private final long refreshPeriod = 20;	//req/rep update period in ms
+	private final String SOCKET_ADDRESS = "tcp://127.0.0.1:5560";
 	
 	public Model() {
 		Map<String,Object> hardware = newMap();
@@ -27,6 +33,7 @@ public class Model {
 		hardware.put("humiditySensor", ComponentFactory.create(Component.HUMIDITY_SENSOR));
 		hardware.put("missionSwitch",  ComponentFactory.create(Component.SWITCH));
 		hardware.put("killSwitch",     ComponentFactory.create(Component.SWITCH));
+		hardware.put("indicatorLights",ComponentFactory.create(Component.INDICATOR_LIGHTS));
 		
 		Map<String,Object> imageFilters = newMap();
 		
@@ -36,6 +43,28 @@ public class Model {
 		robot.put("hardware", hardware);
 		robot.put("imageFilters", imageFilters);
 		robot.put("controlLoops", controlLoops);
+		
+		new Thread() {
+			public void run() {
+				// Communication with hardware here		
+				Context ctx = ZMQ.context(1);
+				
+				Socket req = ctx.socket(ZMQ.REQ);
+				req.connect(SOCKET_ADDRESS);
+				
+				while(true) {
+					req.send(JSONValue.toJSONString(getComponentValue("hardware")));
+					JSONObject data = (JSONObject)JSONValue.parse(req.recvStr());
+					setComponentValue("hardware", data);
+					
+					try {
+						Thread.sleep(refreshPeriod);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}.start();
 	}
 	
 	public static Model getInstance() {
@@ -65,26 +94,23 @@ public class Model {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static void setComponentValue(String component, double value, Map<String,Object> map) {
-		String[] strings = component.split(".");
-		for(int i = 0; i < strings.length - 1; i++)
-			map = (Map<String, Object>) map.get(strings[i]);
-		map.put(strings[strings.length-1], value);
-	}
-	
-	public void setComponentValue(String component, double value) {
-		setComponentValue(component, value, getInstance().robot);
+	public void setComponentValue(String component, Object value) {
+		String[] strings = component.split("\\.");
+		Map<String, Object> comp = robot;
+		for(int i = 0; i < strings.length - 1; i++) {
+			comp = (Map<String, Object>) comp.get(strings[i]);
+		}
+		synchronized (robot) {
+			comp.put(strings[strings.length-1], value);
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static Object getComponentValue(String component, Map<String,Object> map) {
-		String[] strings = component.split(".");
-		for(int i = 0; i < strings.length - 1; i++)
-			map = (Map<String, Object>) map.get(strings[i]);
-		return map.get(strings[strings.length-1]);
-	}
-
 	public Object getComponentValue(String component) {
-		return getComponentValue(component, getInstance().robot);
+		String[] strings = component.split("\\.");
+		Map<String, Object> comp = robot;
+		for(int i = 0; i < strings.length - 1; i++)
+			comp = (Map<String, Object>) comp.get(strings[i]);
+		return comp.get(strings[strings.length-1]);
 	}
 }

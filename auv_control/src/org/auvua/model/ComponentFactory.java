@@ -21,7 +21,7 @@ public class ComponentFactory {
 			component.put("accelZ", 0);
 			component.put("roll", 0);
 			component.put("pitch", 0);
-			component.put("yaw", 0);
+			component.put("heading", 0);
 			break;
 		case DEPTHGAUGE:
 			component.put("depth", 0);
