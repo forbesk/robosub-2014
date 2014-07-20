@@ -1,9 +1,11 @@
+.DS_STORE
 env
+node_modules
+dist
 *.~
 *.pyc
 *.l#*
 *.s#*
 *.b#*
-.DS_STORE
 *.idea
 *.iml
