@@ -1,0 +1,46 @@
+#status {
+    border-radius: 2px;
+    margin: 10px;
+}
+
+#status:before {
+    content: "Status: ";
+}
+
+#status.running {
+    color: #333;
+    background-color: #8ae65c;
+}
+
+#status.running:after {
+    content: "Running";
+}
+
+#status.idle {
+    color: #333;
+    background-color: #fff;
+    content: "Idle";
+}
+
+#status.idle:after {
+    content: "Idle";
+}
+
+#status.connected {
+    color: #333;
+    background-color: #7dbdff;
+}
+
+#status.connected:after {
+    content: "Connected";
+}
+
+#status.error {
+    color: #333;
+    background-color: #ff7171;
+}
+
+#status.error:after {
+    content: "Error";
+}
+
