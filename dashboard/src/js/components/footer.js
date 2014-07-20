@@ -1,11 +1,15 @@
-define(['react', 'underscore'], function(React, _) {
-    var Footer = React.createClass({
-        render: function() {
-            return React.DOM.footer({},
-                React.DOM.a({}, "All rights reserved 2014, AUVA")
-            );
-        }
-    });
+/** @jsx React.DOM */
 
-    return Footer;
-})
+var React = require('react');
+
+var Footer = React.createClass({
+    render: function() {
+        return (
+            <footer>
+                <a>All rights reserved 2014, AUVA</a>
+            </footer>
+        );
+    }
+});
+
+module.exports = Footer;
