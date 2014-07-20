@@ -4,11 +4,11 @@ import java.util.Map;
 
 import org.auvua.model.Model;
 
-public class PIDController {
+public class PIDController implements Controller {
 	
 	private String output;
 	private String input;
-	private TargetFunction function;
+	private Function function;
 	private double kP;
 	private double kI;
 	private double kD;
@@ -20,7 +20,7 @@ public class PIDController {
 	private double lastError = 0;
 	private double outputValue = 0;
 	
-	public PIDController( String input, String output, TargetFunction function, double kP, double kI, double kD ) {
+	public PIDController( String input, String output, Function function, double kP, double kI, double kD ) {
 		this.output = output;
 		this.input = input;
 		this.function = function;
@@ -41,23 +41,13 @@ public class PIDController {
 
 	@SuppressWarnings("unchecked")
 	private void setOutputValue(double outputValue) {
-		Model model = Model.getInstance();
-		Map<String,Object> component = model.robot;
-		String[] strings = output.split(".");
-		for(int i = 0; i < strings.length - 1; i++)
-			component = (Map<String, Object>) component.get(strings[i]);
-		component.put(strings[strings.length-1], outputValue);
+		Model.getInstance().setComponentValue(output, outputValue);
 	}
 
 	@SuppressWarnings("unchecked")
 	private double getError(long timeStep) {
 		lastError = error;
-		Model model = Model.getInstance();
-		Map<String,Object> component = model.robot;
-		String[] strings = input.split(".");
-		for(int i = 0; i < strings.length - 1; i++)
-			component = (Map<String, Object>) component.get(strings[i]);
-		currValue = (double) component.get(strings[strings.length-1]);
+		currValue = (double) Model.getInstance().getComponentValue(input);
 		return currValue - function.getValue(timeStep);
 	}
 	

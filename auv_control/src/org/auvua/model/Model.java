@@ -11,21 +11,22 @@ import org.auvua.sim.MockHardware;
 
 public class Model {
 	
-	public Map<String,Object> robot = new HashMap<String,Object>();
+	private Map<String,Object> robot = new HashMap<String,Object>();
 	
 	private static final Model instance = new Model();
 	
 	public Model() {
 		Map<String,Object> hardware = newMap();
-		hardware.put("surgeLeft",     ComponentFactory.create(Component.MOTOR));
-		hardware.put("surgeRight",    ComponentFactory.create(Component.MOTOR));
-		hardware.put("heaveLeft",     ComponentFactory.create(Component.MOTOR));
-		hardware.put("heaveRight",    ComponentFactory.create(Component.MOTOR));
-		hardware.put("sway",          ComponentFactory.create(Component.MOTOR));
-		hardware.put("depthGauge",    ComponentFactory.create(Component.DEPTHGAUGE));
-		hardware.put("compass",       ComponentFactory.create(Component.COMPASS));
-		hardware.put("missionSwitch", ComponentFactory.create(Component.SWITCH));
-		hardware.put("killSwitch",    ComponentFactory.create(Component.SWITCH));
+		hardware.put("surgeLeft",      ComponentFactory.create(Component.MOTOR));
+		hardware.put("surgeRight",     ComponentFactory.create(Component.MOTOR));
+		hardware.put("heaveLeft",      ComponentFactory.create(Component.MOTOR));
+		hardware.put("heaveRight",     ComponentFactory.create(Component.MOTOR));
+		hardware.put("sway",           ComponentFactory.create(Component.MOTOR));
+		hardware.put("depthGauge",     ComponentFactory.create(Component.DEPTHGAUGE));
+		hardware.put("compass",        ComponentFactory.create(Component.COMPASS));
+		hardware.put("humiditySensor", ComponentFactory.create(Component.HUMIDITY_SENSOR));
+		hardware.put("missionSwitch",  ComponentFactory.create(Component.SWITCH));
+		hardware.put("killSwitch",     ComponentFactory.create(Component.SWITCH));
 		
 		Map<String,Object> imageFilters = newMap();
 		
@@ -39,6 +40,14 @@ public class Model {
 	
 	public static Model getInstance() {
 		return instance;
+	}
+	
+	public void setRobot(Map<String,Object> robot) {
+		this.robot = robot;
+	}
+	
+	public Map<String,Object> getRobot() {
+		return robot;
 	}
 	
 	public static Map<String,Object> newMap() {
@@ -63,6 +72,10 @@ public class Model {
 		map.put(strings[strings.length-1], value);
 	}
 	
+	public void setComponentValue(String component, double value) {
+		setComponentValue(component, value, getInstance().robot);
+	}
+	
 	@SuppressWarnings("unchecked")
 	public static Object getComponentValue(String component, Map<String,Object> map) {
 		String[] strings = component.split(".");
@@ -71,4 +84,7 @@ public class Model {
 		return map.get(strings[strings.length-1]);
 	}
 
+	public Object getComponentValue(String component) {
+		return getComponentValue(component, getInstance().robot);
+	}
 }

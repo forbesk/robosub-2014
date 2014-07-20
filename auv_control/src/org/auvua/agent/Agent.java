@@ -16,8 +16,6 @@ public class Agent implements Runnable {
 
 		while(currentTask != null) {
 
-			currentTask.setModel(model);
-
 			Thread t = new Thread(currentTask);
 			t.start();
 

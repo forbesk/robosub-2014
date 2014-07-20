@@ -1,6 +1,6 @@
 package org.auvua.agent.control;
 
-public class Constant implements TargetFunction {
+public class Constant implements Function {
 
 	public double target;
 	

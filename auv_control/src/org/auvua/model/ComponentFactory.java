@@ -26,6 +26,9 @@ public class ComponentFactory {
 		case DEPTHGAUGE:
 			component.put("depth", 0);
 			break;
+		case HUMIDITY_SENSOR:
+			component.put("humidity", 0);
+			break;
 		case HYDROPHONE_BOARD:
 			component.put("heading", 0);
 			component.put("inclination", 0);

@@ -9,7 +9,7 @@ public class MockHardware {
 	public double[] pos = {0,0,0};
 	public double[] vel = {0,0,0};
 	
-	public double[] angle = {0,0,0};
+	public double[] angle = {0,0,0}; // heading, elevation, bank
 	public double[] omega = {0,0,0};
 	
 	public double[] force = {0,0,0};
@@ -37,7 +37,7 @@ public class MockHardware {
 	public void setState() {
 		long deltaT = currTime - lastTime;
 		// TODO Auto-generated method stub
-		Map<String,Object> robot = Model.getInstance().robot;
+		Map<String,Object> robot = Model.getInstance().getRobot();
 		double surgeLeft = (double) Model.getComponentValue("hardware.surgeLeft.speed", robot) * 100;
 		double surgeRight = (double) Model.getComponentValue("hardware.surgeRight.speed", robot) * 100;
 		double heaveLeft = (double) Model.getComponentValue("hardware.heaveLeft.speed", robot) * 100;
