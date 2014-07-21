@@ -43,7 +43,7 @@ public class ComponentFactory {
 			component.put("speed", 0);
 			break;
 		case SWITCH:
-			component.put("on", 0);
+			component.put("on", 0L);
 			break;
 		}
 		

@@ -53,11 +53,12 @@ public class Model {
 				req.connect(SOCKET_ADDRESS);
 				
 				while(true) {
-					synchronized(robot) {
-						req.send(JSONValue.toJSONString(getComponentValue("hardware")));
-						JSONObject data = (JSONObject)JSONValue.parse(req.recvStr());
-						setComponentValueNonSync("hardware", data);
-					}
+					req.send(JSONValue.toJSONString(getComponentValue("hardware")));
+					JSONObject data = (JSONObject)JSONValue.parse(req.recvStr());
+					setComponentValue("hardware.depthGauge", data.get("depthGauge"));
+					setComponentValue("hardware.compass", data.get("compass"));
+					setComponentValue("hardware.humiditySensor", data.get("humiditySensor"));
+					setComponentValue("hardware.missionSwitch", data.get("missionSwitch"));
 					
 					try {
 						Thread.sleep(refreshPeriod);
@@ -97,18 +98,6 @@ public class Model {
 	
 	@SuppressWarnings("unchecked")
 	public void setComponentValue(String component, Object value) {
-		String[] strings = component.split("\\.");
-		Map<String, Object> comp = robot;
-		for(int i = 0; i < strings.length - 1; i++) {
-			comp = (Map<String, Object>) comp.get(strings[i]);
-		}
-		synchronized(robot) {
-			comp.put(strings[strings.length-1], value);
-		}
-	}
-	
-	@SuppressWarnings("unchecked")
-	public void setComponentValueNonSync(String component, Object value) {
 		String[] strings = component.split("\\.");
 		Map<String, Object> comp = robot;
 		for(int i = 0; i < strings.length - 1; i++) {

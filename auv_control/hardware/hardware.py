@@ -70,84 +70,90 @@ def conv2hex(number):
     return abs(int(number))
 
 def getcompassdata(s):
-	s.flushInput()
-        while 1:
-                data_bytes = []
-                byte1 = s.read(1).encode("hex")
-                if byte1 == '00':
-                        byte2 = s.read(1).encode("hex")
-                        if byte2 == '17':
-                                data_bytes.append(byte1)
-                                data_bytes.append(byte2)
-                                for i in range(0, 19):
-                                        data_bytes.append(s.read(1).encode("hex"))
+    s.flushInput()
+    while 1:
+        data_bytes = []
+        byte1 = s.read(1).encode("hex")
+        if byte1 == '00':
+            byte2 = s.read(1).encode("hex")
+            if byte2 == '17':
+                data_bytes.append(byte1)
+                data_bytes.append(byte2)
+                for i in range(0, 19):
+                    data_bytes.append(s.read(1).encode("hex"))
 
-                                msg = str(int(data_bytes[5], 16)) + ' '
-                                msg = msg + str(int(data_bytes[6], 16)) + ' '
-                                msg = msg + str(int(data_bytes[7], 16)) + ' '
-                                msg = msg + str(int(data_bytes[8], 16))                           
-     				
-                                heading = struct.unpack('!f', ''.join(data_bytes[5:9]).decode("hex"))[0]
-				pitch = struct.unpack('!f', ''.join(data_bytes[10:14]).decode("hex"))[0]
-				roll = struct.unpack('!f', ''.join(data_bytes[15:19]).decode("hex"))[0]
-				
-				return {'heading': heading, 'pitch': pitch, 'roll': roll}
+                msg = str(int(data_bytes[5], 16)) + ' '
+                msg = msg + str(int(data_bytes[6], 16)) + ' '
+                msg = msg + str(int(data_bytes[7], 16)) + ' '
+                msg = msg + str(int(data_bytes[8], 16))                           
 
-                        else:
-                                break
+                heading = struct.unpack('!f', ''.join(data_bytes[5:9]).decode("hex"))[0]
+                pitch = struct.unpack('!f', ''.join(data_bytes[10:14]).decode("hex"))[0]
+                roll = struct.unpack('!f', ''.join(data_bytes[15:19]).decode("hex"))[0]
+
+                return {'heading': heading, 'pitch': pitch, 'roll': roll}
+
+            #else:
+                #break
 
 
 socket = ZMQConnection()
 socket.connect("127.0.0.1:5560")
 
-arduino_serial = serial.Serial("/dev/ttyACM0", 19200, timeout=1000)
-compass_serial = serial.Serial("/dev/ttyS0", 38400, timeout=1000)
+arduino_serial = serial.Serial("/dev/ttyACM0", 19200, timeout=0.02)
+compass_serial = serial.Serial("/dev/ttyS0", 38400, timeout=1)
 
 comp_conf = (0x00, 0x0a, 0x03, 0x04, 0x05, 0x18, 0x19, 0x4f, 0xe2, 0xef)
 comp_start = (0x00, 0x05, 0x15, 0xbd, 0x61)
 compass_serial.write(bytearray(comp_conf))
 compass_serial.write(bytearray(comp_start))
 
+missionswitch = 1
 
 while(1):
-	if(socket.request_waiting()):
-		response = socket.receive()
+    if(socket.request_waiting()):
+        response = socket.receive()
 
-                asout =   (0x7f, #Start byte for indexing
-			   0x01, 
-			   0x00 if response['heaveRight']['speed'] < 0 else 0x01, 
-			   conv2hex(response['heaveRight']['speed'] * 100),
-			   0x02, 
-			   0x00 if response['surgeRight']['speed'] < 0 else 0x01, 
-			   conv2hex(response['surgeRight']['speed'] * 100),
-			   0x03, 
-			   0x00 if response['surgeLeft']['speed'] > 0 else 0x01, 
-			   conv2hex(response['surgeLeft']['speed'] * 100),
-			   0x04, 
-			   0x00 if response['heaveLeft']['speed'] > 0 else 0x01, 
-			   conv2hex(response['heaveLeft']['speed'] * 100),
-			   0x05, 
-			   0x00 if response['sway']['speed'] < 0 else 0x01, 
-			   conv2hex(response['sway']['speed'] * 100),
-			   0x0d,
-			   conv2hex(response['indicatorLights']['white'] * 100),
-			   0x0b,
-			   conv2hex(response['indicatorLights']['red'] * 100),
-			   0x0a,
-			   conv2hex(response['indicatorLights']['green'] * 100),
-			   0x09,
-			   conv2hex(response['indicatorLights']['blue'] * 100),
-			   0x00, 0x00)	#empty bytes!
+        asout =   (0x7f, #Start byte for indexing
+        0x01, 
+        0x00 if response['heaveRight']['speed'] < 0 else 0x01, 
+        conv2hex(response['heaveRight']['speed'] * 100),
+        0x02, 
+        0x00 if response['surgeRight']['speed'] < 0 else 0x01, 
+        conv2hex(response['surgeRight']['speed'] * 100),
+        0x03, 
+        0x00 if response['surgeLeft']['speed'] > 0 else 0x01, 
+        conv2hex(response['surgeLeft']['speed'] * 100),
+        0x04, 
+        0x00 if response['heaveLeft']['speed'] > 0 else 0x01, 
+        conv2hex(response['heaveLeft']['speed'] * 100),
+        0x05, 
+        0x00 if response['sway']['speed'] < 0 else 0x01, 
+        conv2hex(response['sway']['speed'] * 100),
+        0x0d,
+        conv2hex(response['indicatorLights']['white'] * 100),
+        0x0b,
+        conv2hex(response['indicatorLights']['red'] * 100),
+        0x0a,
+        conv2hex(response['indicatorLights']['green'] * 100),
+        0x09,
+        conv2hex(response['indicatorLights']['blue'] * 100),
+        0x00, 0x00)	#empty bytes!
 
-		arduino_serial.write(bytearray(asout))
-		
-		compdata = getcompassdata(compass_serial)
-		response['compass']['heading'] = compdata['heading']
-		response['compass']['pitch'] = compdata['pitch']
-		response['compass']['roll'] = compdata['roll']
+        arduino_serial.write(bytearray(asout))
+        msg = arduino_serial.read(3)
 
-		print compdata
+        #sensor * 5.0f / 1024.0f) - 1.828f) * 49.0f * 3.909f;
+        if len(msg) >= 3:
+            response['depthGauge']['depth'] = (((ord(msg[0])*256 + ord(msg[1])) * 5.0/1024.0) - 1.828) * 49.0 * 3.909
+            response['missionSwitch']['on'] = 1 if (ord(msg[2]) == 0 and missionswitch == 1) else 0
+            missionswitch = ord(msg[2])
 
-		socket.send(response)
+        compdata = getcompassdata(compass_serial)
+        response['compass']['heading'] = compdata['heading']
+        response['compass']['pitch'] = compdata['pitch']
+        response['compass']['roll'] = compdata['roll']
+
+        socket.send(response)
 	
 	

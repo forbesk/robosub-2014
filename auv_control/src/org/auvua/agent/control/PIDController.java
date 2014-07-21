@@ -41,6 +41,8 @@ public class PIDController implements Controller {
 
 	@SuppressWarnings("unchecked")
 	private void setOutputValue(double outputValue) {
+		outputValue = outputValue > 1 ? 1 : outputValue;
+		outputValue = outputValue < -1 ? -1 : outputValue;
 		Model.getInstance().setComponentValue(output, outputValue);
 	}
 

@@ -51,7 +51,8 @@ public class DriveStraight extends Task {
 			lastTime = currTime;
 			currTime = System.currentTimeMillis();
 			
-			System.out.println(Model.getInstance().getComponentValue("hardware.compass.heading"));
+			System.out.println(Model.getInstance().getComponentValue("hardware.missionSwitch.on"));
+
 		} while(currTime < startTime + duration);
 		
 		Model.getInstance().setComponentValue("hardware.indicatorLights.blue", 0);

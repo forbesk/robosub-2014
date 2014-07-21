@@ -18,6 +18,7 @@
 #define GREENPIN 10
 #define BLUEPIN 9
 #define DEPTHPIN A5
+#define MISSIONPIN 3
 
 #define BAUD_RATE 19200
 #define TIMEOUT_THRESHOLD 1000
@@ -75,7 +76,7 @@ void setMotorLimit(uint8_t device_id, uint8_t limit_type, int limit_value) {
 }
 
 void setIndicator(uint8_t pin, uint8_t value) {
-    analogWrite(pin, value);
+    analogWrite(pin, (uint8_t)((uint16_t)value*255/100));
 }
 
 
@@ -85,16 +86,15 @@ void setIndicator(uint8_t pin, uint8_t value) {
 void sendSensorData() {
     static long previous_time;
 
-    if (abs(previous_time - current_time) > TELEMETRY_TIMEOUT) {
-        previous_time = current_time;
-        word sensorValue1 = analogRead(DEPTHPIN);
-        byte packet[3] = {0};
+    //if (abs(previous_time - current_time) > TELEMETRY_TIMEOUT) {
+    //previous_time = current_time;
+    word sensorValue1 = analogRead(DEPTHPIN);
+    byte packet[3] = {0};
 
-        packet[0] = DEPTH_SENSOR;
-        packet[1] = highByte(sensorValue1);
-        packet[2] = lowByte(sensorValue1);
-        Serial.write(packet, 3);
-    }
+    packet[0] = highByte(sensorValue1);
+    packet[1] = lowByte(sensorValue1);
+    packet[2] = (byte)digitalRead(MISSIONPIN);
+    Serial.write(packet, 3);
 }
 void setup() {
     Serial.begin(BAUD_RATE);
@@ -109,9 +109,9 @@ void setup() {
     pinMode(BLUEPIN, OUTPUT);
     
     analogWrite(WHITEPIN, 0);
-    analogWrite(REDPIN, 255);
+    analogWrite(REDPIN, 100);
     analogWrite(GREENPIN, 0);
-    analogWrite(BLUEPIN, 255);
+    analogWrite(BLUEPIN, 100);
     
     delay(1000);
     
@@ -165,6 +165,8 @@ void loop() {
         serial_controller.write(SAFE_START_FLAG);
 
         previous_time = millis();
+
+        sendSensorData();
     }
 
     if ((current_time - previous_time) > TIMEOUT_THRESHOLD) {
@@ -173,7 +175,6 @@ void loop() {
     }
 
     current_time = millis();
-    //sendSensorData();
 }
 
 int get_checksum(byte packet[]) {
