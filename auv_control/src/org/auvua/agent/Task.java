@@ -1,7 +1,5 @@
 package org.auvua.agent;
 
-import org.auvua.model.Model;
-
 public abstract class Task implements Runnable {
 
 	public Task successTask = null;
@@ -10,10 +8,13 @@ public abstract class Task implements Runnable {
 	public TaskState state = TaskState.NOTSTARTED;
 	public boolean completed = false;
 	
-	@Override
-	abstract public void run();
+	public abstract TaskState runTaskBody();
 	
-	protected void cleanup() {
+	public void run() {
+		state = TaskState.RUNNING;
+		
+		state = runTaskBody();
+		
 		synchronized(this) {
 			completed = true;
 			this.notifyAll();
@@ -37,7 +38,7 @@ public abstract class Task implements Runnable {
 			case SUCCEEDED: return successTask;
 			case FAILED:    return failureTask;
 			case TIMEDOUT:  return timeoutTask;
-			default:        return this;
+			default:        return null;
 		}
 	}
 	

@@ -5,7 +5,6 @@ import org.auvua.model.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.json.simple.*;
-import org.json.simple.parser.*;
 
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
@@ -19,7 +18,6 @@ public class DashboardEndpoint {
 	
 	public DashboardEndpoint() {
 		new Thread(new Runnable() {
-			@SuppressWarnings("unchecked")
 			@Override
 			public void run() {
 				while(true) {

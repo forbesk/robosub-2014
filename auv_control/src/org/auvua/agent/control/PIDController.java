@@ -1,7 +1,5 @@
 package org.auvua.agent.control;
 
-import java.util.Map;
-
 import org.auvua.model.Model;
 
 public class PIDController implements Controller {
@@ -39,14 +37,12 @@ public class PIDController implements Controller {
 		setOutputValue(outputValue);
 	}
 
-	@SuppressWarnings("unchecked")
 	private void setOutputValue(double outputValue) {
 		outputValue = outputValue > 1 ? 1 : outputValue;
 		outputValue = outputValue < -1 ? -1 : outputValue;
 		Model.getInstance().setComponentValue(output, outputValue);
 	}
 
-	@SuppressWarnings("unchecked")
 	private double getError(long timeStep) {
 		lastError = error;
 		currValue = (double) Model.getInstance().getComponentValue(input);

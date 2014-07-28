@@ -8,12 +8,19 @@ import java.io.InputStreamReader;
 import org.auvua.agent.*;
 import org.auvua.agent.tasks.*;
 import org.glassfish.tyrus.server.Server;
+import org.opencv.core.Core;
 
 public class AUVServer {
 	private static Agent agent;
 	
 	public static void main(String args[]) {
-		Task task0 = new ConstantDepthAndHeading(-29, 45, 120000);
+		System.loadLibrary( Core.NATIVE_LIBRARY_NAME );
+		
+		//Task task0 = new ConstantDepthAndHeading(-20, 45, 60000);
+		Task task0 = new DriveStraight(.5, 2000);
+		Task task1 = new AlignToMarker(5000);
+		
+		task0.setSuccessTask(task1);
 		
 		agent = new Agent(task0);
 		

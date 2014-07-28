@@ -4,9 +4,7 @@ import org.auvua.agent.Task;
 import org.auvua.agent.control.Constant;
 import org.auvua.agent.control.Controller;
 import org.auvua.agent.control.OpenLoopController;
-import org.auvua.agent.control.PIDController;
 import org.auvua.model.Model;
-import org.auvua.model.actuators.Motor;
 
 /**
  * A task to drive forward at full speed and maintain a certain depth
@@ -22,8 +20,7 @@ public class DriveStraight extends Task {
 	}
 
 	@Override
-	public void run() {
-		state = TaskState.RUNNING;
+	public TaskState runTaskBody() {
 		
 		Controller surgeLeftControl =  new OpenLoopController("hardware.surgeLeft.speed", new Constant(speed));
 		Controller surgeRightControl = new OpenLoopController("hardware.surgeRight.speed", new Constant(speed));
@@ -50,8 +47,6 @@ public class DriveStraight extends Task {
 			
 			lastTime = currTime;
 			currTime = System.currentTimeMillis();
-			
-			System.out.println(Model.getInstance().getComponentValue("hardware.missionSwitch.on"));
 
 		} while(currTime < startTime + duration);
 		
@@ -59,11 +54,10 @@ public class DriveStraight extends Task {
 		Model.getInstance().setComponentValue("hardware.indicatorLights.green", 0);
 		Model.getInstance().setComponentValue("hardware.indicatorLights.red", 0);
 		
-		state = TaskState.SUCCEEDED;
-		
 		Model.getInstance().setComponentValue("hardware.surgeLeft.speed", 0);
 		Model.getInstance().setComponentValue("hardware.surgeRight.speed", 0);
-		cleanup();
+		
+		return TaskState.SUCCEEDED;
 	}
 
 }

@@ -1,7 +1,5 @@
 package org.auvua.sim;
 
-import java.util.Map;
-
 import org.auvua.model.Model;
 
 public class MockHardware {
@@ -37,7 +35,6 @@ public class MockHardware {
 	public void setState() {
 		long deltaT = currTime - lastTime;
 		// TODO Auto-generated method stub
-		Map<String,Object> robot = Model.getInstance().getRobot();
 		double surgeLeft = (double) Model.getInstance().getComponentValue("hardware.surgeLeft.speed") * 100;
 		double surgeRight = (double) Model.getInstance().getComponentValue("hardware.surgeRight.speed") * 100;
 		double heaveLeft = (double) Model.getInstance().getComponentValue("hardware.heaveLeft.speed") * 100;

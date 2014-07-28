@@ -2,12 +2,11 @@ package org.auvua.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
-import org.auvua.model.actuators.Motor;
-import org.auvua.model.sensors.Compass;
-import org.auvua.model.sensors.DepthGauge;
-import org.auvua.model.sensors.Switch;
-import org.auvua.sim.MockHardware;
+import org.auvua.vision.Camera;
+import org.auvua.vision.CameraViewer;
+import org.auvua.vision.ImageFilter;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.zeromq.*;
@@ -16,24 +15,31 @@ import org.zeromq.ZMQ.*;
 public class Model {
 	
 	private Map<String,Object> robot = new HashMap<String,Object>();
+	private Map<String,Object> cameras = new HashMap<String,Object>();
 	
 	private static final Model instance = new Model();
 	private final long refreshPeriod = 20;	//req/rep update period in ms
 	private final String SOCKET_ADDRESS = "tcp://127.0.0.1:5560";
 	
+	private boolean finished = false;
+	
 	public Model() {
+		
 		Map<String,Object> hardware = newMap();
-		hardware.put("surgeLeft",      ComponentFactory.create(Component.MOTOR));
-		hardware.put("surgeRight",     ComponentFactory.create(Component.MOTOR));
-		hardware.put("heaveLeft",      ComponentFactory.create(Component.MOTOR));
-		hardware.put("heaveRight",     ComponentFactory.create(Component.MOTOR));
-		hardware.put("sway",           ComponentFactory.create(Component.MOTOR));
-		hardware.put("depthGauge",     ComponentFactory.create(Component.DEPTHGAUGE));
-		hardware.put("compass",        ComponentFactory.create(Component.COMPASS));
-		hardware.put("humiditySensor", ComponentFactory.create(Component.HUMIDITY_SENSOR));
-		hardware.put("missionSwitch",  ComponentFactory.create(Component.SWITCH));
-		hardware.put("killSwitch",     ComponentFactory.create(Component.SWITCH));
-		hardware.put("indicatorLights",ComponentFactory.create(Component.INDICATOR_LIGHTS));
+		hardware.put("surgeLeft",       ComponentFactory.create(Component.MOTOR));
+		hardware.put("surgeRight",      ComponentFactory.create(Component.MOTOR));
+		hardware.put("heaveLeft",       ComponentFactory.create(Component.MOTOR));
+		hardware.put("heaveRight",      ComponentFactory.create(Component.MOTOR));
+		hardware.put("sway",            ComponentFactory.create(Component.MOTOR));
+		hardware.put("depthGauge",      ComponentFactory.create(Component.DEPTHGAUGE));
+		hardware.put("compass",         ComponentFactory.create(Component.COMPASS));
+		hardware.put("humiditySensor",  ComponentFactory.create(Component.HUMIDITY_SENSOR));
+		hardware.put("missionSwitch",   ComponentFactory.create(Component.SWITCH));
+		hardware.put("killSwitch",      ComponentFactory.create(Component.SWITCH));
+		hardware.put("indicatorLights", ComponentFactory.create(Component.INDICATOR_LIGHTS));
+		
+		cameras.put("frontCamera",      new Camera());
+		// cameras.put("bottomCamera",    new Camera());
 		
 		Map<String,Object> imageFilters = newMap();
 		
@@ -52,7 +58,9 @@ public class Model {
 				Socket req = ctx.socket(ZMQ.REQ);
 				req.connect(SOCKET_ADDRESS);
 				
-				while(true) {
+				CameraViewer viewer = new CameraViewer();
+				
+				while(!finished) {
 					req.send(JSONValue.toJSONString(getComponentValue("hardware")));
 					JSONObject data = (JSONObject)JSONValue.parse(req.recvStr());
 					setComponentValue("hardware.depthGauge", data.get("depthGauge"));
@@ -60,6 +68,23 @@ public class Model {
 					setComponentValue("hardware.humiditySensor", data.get("humiditySensor"));
 					setComponentValue("hardware.missionSwitch", data.get("missionSwitch"));
 					
+					Camera frontCam = (Camera) cameras.get("frontCamera");
+					frontCam.capture();
+					frontCam.applyFilters();
+					
+					viewer.setImage(frontCam.getImage());
+					
+					for (Entry<String,Object> e : frontCam.getFilterOutputs().entrySet()) {
+						setComponentValue("imageFilters." + e.getKey(), e.getValue());
+					}
+					/*
+					Camera bottomCam = (Camera) getComponentValue("hardware.bottomCamera");
+					bottomCam.capture();
+					bottomCam.applyFilters();
+					for (Entry<String,Object> e : bottomCam.getFilterOutputs().entrySet()) {
+						setComponentValue("imageFilters." + e.getKey(), e.getValue());
+					}
+					*/
 					try {
 						Thread.sleep(refreshPeriod);
 					} catch (InterruptedException e) {
@@ -86,16 +111,6 @@ public class Model {
 		return new HashMap<String,Object>();
 	}
 	
-	public void getState() {
-		// Receive hardware update via ZMQ
-		MockHardware.getInstance().getState();
-	}
-
-	public void setState() {
-		// Send hardware update via ZMQ
-		MockHardware.getInstance().setState();
-	}
-	
 	@SuppressWarnings("unchecked")
 	public void setComponentValue(String component, Object value) {
 		String[] strings = component.split("\\.");
@@ -113,5 +128,22 @@ public class Model {
 		for(int i = 0; i < strings.length - 1; i++)
 			comp = (Map<String, Object>) comp.get(strings[i]);
 		return comp.get(strings[strings.length-1]);
+	}
+
+	public void addImageFilter(String cameraName, String filterName, ImageFilter filter) {
+		Camera cam = (Camera) cameras.get(cameraName);
+		cam.addFilter(filterName, filter);
+		cam.capture();
+		cam.applyFilters();
+		setComponentValue("imageFilters." + filterName, cam.getFilterOutputs().get(filterName));
+	}
+	
+	public void removeImageFilter(String cameraName, String filterName) {
+		Camera cam = (Camera) cameras.get(cameraName);
+		cam.removeFilter(filterName);
+	}
+
+	public void finish() {
+		finished = true;
 	}
 }

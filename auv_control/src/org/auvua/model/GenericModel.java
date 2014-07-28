@@ -7,7 +7,6 @@ import org.json.simple.JSONObject;
 
 public class GenericModel {
 	
-	@SuppressWarnings("unchecked")
 	public static void main( String[] args ) {
 		
 		Map<String,Object> hardware = newMap();
