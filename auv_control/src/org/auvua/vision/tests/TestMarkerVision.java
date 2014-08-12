@@ -1,4 +1,4 @@
-package org.auvua.vision;
+package org.auvua.vision.tests;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -18,6 +18,7 @@ import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.RotatedRect;
 import org.opencv.core.Scalar;
+import org.opencv.highgui.Highgui;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 
@@ -27,27 +28,29 @@ import org.opencv.imgproc.Imgproc;
  * 
  * Filter testing class
  */
-public class VisionTest {
+public class TestMarkerVision {
 	
 	public static void main( String[] args )
 	{
 		System.loadLibrary( Core.NATIVE_LIBRARY_NAME );
 		
-		VideoCapture camera = new VideoCapture(0);
+		VideoCapture camera = new VideoCapture("downBuoys");
 	    if(!camera.isOpened()){
 	        System.out.println("Camera Error");
 	    }
 	    else{
 	        System.out.println("Camera OK?");
 	    }
-
+	    
+	    Mat raw = new Mat();
+	    //raw = Highgui.imread("marker.png",Highgui.IMREAD_COLOR);
 
 	    JFrame gui = new JFrame();
 	    JFrame controls = new JFrame();
 	    controls.setLayout(new GridLayout(6,1));
 	    JSlider[] sliders = new JSlider[6];
 	    
-	    int[] initValues = { 170, 255, 0, 100, 0, 100 };
+	    int[] initValues = { 110, 255, 0, 180, 0, 180 };
 	    
 	    for(int i = 0; i < sliders.length; i++) {
 	    	sliders[i] = new JSlider(0,255,initValues[i]);
@@ -65,13 +68,19 @@ public class VisionTest {
 	    gui.setResizable(false);
 	    gui.setSize(800, 800);
 	    
-	    Mat frame = new Mat(),
-	        filtered = new Mat(),
-            edges = new Mat(),
-            rgb = new Mat();
+    	Point rectangleCenter = new Point(320,240);
+    	double theta = 0.0;
+    	double length = 0.0;
+    	double width = 0.0;
 	    
 	    while(true) {
-	    	camera.read(frame);
+		    Mat frame = new Mat(),
+			        filtered = new Mat(),
+		            edges = new Mat(),
+		            rgb = new Mat();
+	    	
+	    	camera.read(raw);
+	    	frame = raw.clone();
 	    	
 	    	Imgproc.cvtColor(frame, rgb, Imgproc.COLOR_BGR2RGB);
 	    	
@@ -81,49 +90,51 @@ public class VisionTest {
 	    	Core.inRange(rgb, lower, upper, filtered);
 	    	
 	    	Imgproc.Canny(filtered, edges, 50, 150);
-	    	Imgproc.cvtColor(edges, edges, Imgproc.COLOR_GRAY2BGR);
 	    	
 	    	List<MatOfPoint> contours = new LinkedList<MatOfPoint>();
 	    	Imgproc.findContours(filtered, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 	    	
-	    	MatOfPoint largestContour = null;
-	    	double largestArea = 0;
-	    	for(MatOfPoint contour : contours) {
+	    	double maxRectangularity = 0.8;
+	    	
+	    	for (MatOfPoint contour : contours) {
 	    		double area = Imgproc.contourArea(contour);
-	    		if(area > largestArea) {
-	    			largestArea = area;
-	    			largestContour = contour;
-	    		}
-	    	}
-
-	    	if(largestContour != null) {
-    	    	
-    	    	Core.addWeighted(frame, 0.7, edges, 0.3, 0, frame);
-
-	    		RotatedRect box = Imgproc.minAreaRect(new MatOfPoint2f(largestContour.toArray()));
-
-	    		Core.circle(frame, box.center, 5, new Scalar(255,0,0), 3);
-
-	    		double theta;
-	    		if(box.size.height > box.size.width) {
-	    			theta = box.angle / 180 * Math.PI;
-	    		} else {
-	    			theta = (box.angle + 90) / 180 * Math.PI;
-	    		}
-
-	    		System.out.println(theta);
 	    		
-	    		Point start = new Point(), end = new Point();
-	    		double a = Math.cos(theta), b = Math.sin(theta);
-
-	    		start.x = Math.round(box.center.x + 1000*(-b));
-	    		start.y = Math.round(box.center.y + 1000*(a));
-	    		end.x = Math.round(box.center.x - 1000*(-b));
-	    		end.y = Math.round(box.center.y - 1000*(a));
-
-	    		Core.line(frame, start, end, new Scalar(0,255,0),2);
+	    		RotatedRect box = Imgproc.minAreaRect(new MatOfPoint2f(contour.toArray()));
+	    		
+	    		double rectangularity = area / (box.size.height * box.size.width);
+	    		
+	    		System.out.println(rectangularity);
+	    		
+	    		if(area > 3000 && rectangularity > maxRectangularity) {
+	    			maxRectangularity = rectangularity;
+	    			rectangleCenter = box.center;
+	        		if(box.size.height > box.size.width) {
+	        			theta = box.angle / 180 * Math.PI;
+	        			length = box.size.height;
+	        			width = box.size.width;
+	        		} else {
+	        			theta = (box.angle + 90) / 180 * Math.PI;
+	        			length = box.size.width;
+	        			width = box.size.height;
+	        		}
+	    		}
 	    	}
 
+	    	Imgproc.cvtColor(edges, edges, Imgproc.COLOR_GRAY2BGR);
+	    	
+	    	Core.addWeighted(frame, 0.7, edges, 0.3, 0, frame);
+			
+			Core.circle(frame, rectangleCenter, 5, new Scalar(255,0,0), 3);
+			
+    		Point start = new Point(), end = new Point();
+    		double a = Math.cos(theta), b = Math.sin(theta);
+
+    		start.x = Math.round(rectangleCenter.x + 1000*(-b));
+    		start.y = Math.round(rectangleCenter.y + 1000*(a));
+    		end.x = Math.round(rectangleCenter.x - 1000*(-b));
+    		end.y = Math.round(rectangleCenter.y - 1000*(a));
+
+    		Core.line(frame, start, end, new Scalar(0,255,0),2);
 
 	    	gui.getContentPane().getGraphics().drawImage(toBufferedImage(frame), 0, 0, null);
 	    	gui.setSize(frame.width(), frame.height());

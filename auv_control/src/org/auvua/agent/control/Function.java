@@ -2,6 +2,6 @@ package org.auvua.agent.control;
 
 public interface Function {
 	
-	double getValue(long timeStep);
+	double getValue(long time);
 	
 }

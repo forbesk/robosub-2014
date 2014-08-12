@@ -5,48 +5,33 @@ import org.auvua.model.Model;
 public class PIDController implements Controller {
 	
 	private String output;
-	private String input;
-	private Function function;
-	private double kP;
-	private double kI;
-	private double kD;
+	private boolean stop = false;
 	
-	private double error = 0;
-	private double integralError = 0;
-	private double derivativeError = 0;
-	private double currValue = 0;
-	private double lastError = 0;
-	private double outputValue = 0;
+	private PIDLoop loop;
 	
-	public PIDController( String input, String output, Function function, double kP, double kI, double kD ) {
+	public PIDController( String output, PIDLoop loop ) {
+		this.loop = loop;
 		this.output = output;
-		this.input = input;
-		this.function = function;
-		this.kP = kP;
-		this.kI = kI;
-		this.kD = kD;
-	}
-	
-	public void advanceTimestep(long timeStep) {
-		if(timeStep == 0) return;
-		lastError = error;
-		error = getError(timeStep);
-		integralError += timeStep * (error) / 1000.0;
-		derivativeError = (error - lastError) / (timeStep / 1000.0);
-		outputValue = kP*error + kI*integralError + kD*derivativeError;
-		setOutputValue(outputValue);
 	}
 
-	private void setOutputValue(double outputValue) {
-		outputValue = outputValue > 1 ? 1 : outputValue;
-		outputValue = outputValue < -1 ? -1 : outputValue;
-		Model.getInstance().setComponentValue(output, outputValue);
+	@Override
+	public void start() {
+		loop.start();
+		new Thread() {
+			public void run() {
+				while(!stop) {
+					Model.getInstance().setComponentValue(output, loop.getOutputValue());
+					try { Thread.sleep(50); } catch (InterruptedException e) { e.printStackTrace(); }
+				}
+				Model.getInstance().setComponentValue(output, 0.0);
+			}
+		}.start();
 	}
 
-	private double getError(long timeStep) {
-		lastError = error;
-		currValue = (double) Model.getInstance().getComponentValue(input);
-		return currValue - function.getValue(timeStep);
+	@Override
+	public void stop() {
+		loop.stop();
+		stop = true;
 	}
 	
 }

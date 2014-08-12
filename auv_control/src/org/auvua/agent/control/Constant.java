@@ -9,7 +9,7 @@ public class Constant implements Function {
 	}
 	
 	@Override
-	public double getValue(long timeStep) {
+	public double getValue(long time) {
 		return target;
 	}
 

@@ -27,6 +27,16 @@ public class Camera {
 	    }
 	}
 	
+	public Camera(int deviceNumber) {
+		camera = new VideoCapture(deviceNumber);
+	    if(!camera.isOpened()){
+	        System.out.println("Camera Error");
+	    }
+	    else{
+	        System.out.println("Camera Opened");
+	    }
+	}
+	
 	public void addFilter(String filterName, ImageFilter toAdd) {
 		filters.put(filterName,toAdd);
 		filterOutputs.put(filterName, toAdd.getFilterValues());

@@ -1,16 +1,17 @@
-package org.auvua.agent.tasks;
+package org.auvua.agent.tasks.align;
 
 import org.auvua.agent.Task;
 import org.auvua.agent.control.Constant;
 import org.auvua.agent.control.PIDController;
 import org.auvua.model.Model;
 import org.auvua.vision.FloorMarkerFilter;
+import org.auvua.vision.GateFilter;
 
-public class AlignToMarker extends Task {
+public class AlignToGate extends Task {
 	
 	private long duration;
 	
-	public AlignToMarker( long duration ) {
+	public AlignToGate( long duration ) {
 		this.duration = duration;
 	}
 	
@@ -18,10 +19,10 @@ public class AlignToMarker extends Task {
 	public TaskState runTaskBody() {
 		Constant constantHeading = new Constant(0);
 		
-		Model.getInstance().addImageFilter("frontCamera", "markerFilter", new FloorMarkerFilter());
+		Model.getInstance().addImageFilter("frontCamera", "markerFilter", new GateFilter());
 
-		PIDController heaveLeftControl =  new PIDController("imageFilters.markerFilter.angle", "hardware.heaveLeft.speed", constantHeading, .5, 0, 0);
-		PIDController heaveRightControl = new PIDController("imageFilters.markerFilter.angle", "hardware.heaveRight.speed", constantHeading, .5, 0, 0);
+		//PIDController heaveLeftControl =  new PIDController("imageFilters.markerFilter.angle", "hardware.heaveLeft.speed", constantHeading, .5, 0, 0);
+		//PIDController heaveRightControl = new PIDController("imageFilters.markerFilter.angle", "hardware.heaveRight.speed", constantHeading, .5, 0, 0);
 
 		long startTime = System.currentTimeMillis();
 		long lastTime = startTime;
@@ -30,8 +31,8 @@ public class AlignToMarker extends Task {
 		do {
 			long timeStep = currTime - lastTime;
 			
-			heaveLeftControl.advanceTimestep(timeStep);
-			heaveRightControl.advanceTimestep(timeStep);
+			//heaveLeftControl.advanceTimestep(timeStep);
+			//heaveRightControl.advanceTimestep(timeStep);
 
 			lastTime = currTime;
 			currTime = System.currentTimeMillis();

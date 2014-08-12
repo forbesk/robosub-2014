@@ -7,6 +7,7 @@ public abstract class Task implements Runnable {
 	public Task timeoutTask = null;
 	public TaskState state = TaskState.NOTSTARTED;
 	public boolean completed = false;
+	public boolean interrupted = false;
 	
 	public abstract TaskState runTaskBody();
 	
@@ -34,16 +35,23 @@ public abstract class Task implements Runnable {
 	}
 	
 	public Task getNextTask() {
+		if(interrupted) return null;
+		
 		switch(state) {
-			case SUCCEEDED: return successTask;
-			case FAILED:    return failureTask;
-			case TIMEDOUT:  return timeoutTask;
-			default:        return null;
+			case SUCCEEDED:   return successTask;
+			case FAILED:      return failureTask;
+			case TIMEDOUT:    return timeoutTask;
+			case INTERRUPTED: return null;
+			default:          return null;
 		}
 	}
 	
 	public boolean isComplete() {
 		return completed;
+	}
+	
+	public void stop() {
+		interrupted = true;
 	}
 	
 	public enum TaskState {

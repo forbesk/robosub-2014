@@ -113,7 +113,7 @@ compass_serial.write(bytearray(comp_start))
 
 missionswitch = 1
 missionSwitchToggle = 0;
-maxSpeed = 1.0
+maxSpeed = .5
 
 while(1):
     if(socket.request_waiting()):
@@ -144,7 +144,7 @@ while(1):
         0x00 if response['heaveLeft']['speed'] < 0 else 0x01, 
         conv2hex(response['heaveLeft']['speed'] * 100),
         0x05, 
-        0x00 if response['sway']['speed'] > 0 else 0x01, 
+        0x00 if response['sway']['speed'] < 0 else 0x01, 
         conv2hex(response['sway']['speed'] * 100),
         0x0d,
         conv2hex(response['indicatorLights']['white'] * 100),
@@ -165,9 +165,6 @@ while(1):
             if ord(msg[2]) == 0 and missionswitch == 1: 
                 response['missionSwitch']['on'] = 1 - response['missionSwitch']['on']
             missionswitch = ord(msg[2])
-
-        if response['missionComplete'] == 1:
-            response['missionSwitch']['on'] = 0
 
         compdata = getcompassdata(compass_serial)
         response['compass']['heading'] = compdata['heading']
