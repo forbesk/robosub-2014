@@ -3,6 +3,7 @@
   <groupId>AUVUA-2014</groupId>
   <artifactId>AUVUA-2014</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+
   <build>
     <sourceDirectory>src</sourceDirectory>
     <resources>
@@ -25,6 +26,11 @@
     </plugins>
   </build>
   <dependencies>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId>
+      <version>7.2.0.v20101020</version>
+    </dependency>
   	<dependency>
   		<groupId>org.glassfish.tyrus</groupId>
   		<artifactId>tyrus-server</artifactId>

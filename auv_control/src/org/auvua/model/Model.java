@@ -41,8 +41,8 @@ public class Model {
 		hardware.put("indicatorLights", ComponentFactory.create(Component.INDICATOR_LIGHTS));
 		hardware.put("missionComplete", 0L);
 		
-		cameras.put("frontCamera", new Camera(0));
-		cameras.put("bottomCamera", new Camera(1));
+		//cameras.put("frontCamera", new Camera(0));
+		//cameras.put("bottomCamera", new Camera(1));
 		
 		Map<String,Object> imageFilters = newMap();
 		Map<String,Object> controlLoops = newMap();
@@ -60,13 +60,16 @@ public class Model {
 				Socket req = ctx.socket(ZMQ.REQ);
 				req.connect(SOCKET_ADDRESS);
 				
-				CameraViewer frontViewer = new CameraViewer();
-				CameraViewer bottomViewer = new CameraViewer();
+				//CameraViewer frontViewer = new CameraViewer();
+				//CameraViewer bottomViewer = new CameraViewer();
 				
 				gyroIntegrator.start();
 				
+				System.out.println(JSONValue.toJSONString(getComponentValue("hardware")));
+				
+		
 				while(!finished) {
-					
+				
 					req.send(JSONValue.toJSONString(getComponentValue("hardware")));
 					
 					JSONObject data = (JSONObject)JSONValue.parse(req.recvStr());
@@ -82,7 +85,7 @@ public class Model {
 //					System.out.print(Model.getInstance().getComponentValue("hardware.compass.gyroHeading"));
 //					System.out.println("\t" + Model.getInstance().getComponentValue("hardware.compass.heading"));
 					
-					
+					/*
 					Camera frontCam = (Camera) cameras.get("frontCamera");
 					frontCam.capture();
 					frontCam.applyFilters();
@@ -98,7 +101,7 @@ public class Model {
 					bottomViewer.setImage(bottomCam.getImage());
 					for (Entry<String,Object> e : bottomCam.getFilterOutputs().entrySet()) {
 						setComponentValue("imageFilters." + e.getKey(), e.getValue());
-					}
+					}*/
 					
 					try {
 						Thread.sleep(refreshPeriod);

@@ -165,6 +165,7 @@ while(1):
             if ord(msg[2]) == 0 and missionswitch == 1: 
                 response['missionSwitch']['on'] = 1 - response['missionSwitch']['on']
             missionswitch = ord(msg[2])
+            print missionswitch
 
         if response['missionComplete'] == 1:
             response['missionSwitch']['on'] = 0

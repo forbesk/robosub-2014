@@ -26,7 +26,7 @@ public class Agent implements Runnable {
 			
 			System.out.println("Mission started!");
 			
-			startMissionSwitchListener();
+			//startMissionSwitchListener();
 
 			while(currentTask != null) {
 

@@ -1,9 +1,15 @@
 package org.auvua.server;
 
-import org.auvua.server.DashboardEndpoint;
+import org.auvua.model.Model;
+import org.auvua.vision.HTTPCameraStream;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.auvua.agent.*;
 import org.auvua.agent.MissionFactory.MissionType;
@@ -13,15 +19,25 @@ import org.auvua.agent.tasks.search.SearchForManeuverPole;
 import org.auvua.agent.tasks.search.SearchForRedDownBuoy;
 import org.auvua.agent.tasks.special.CircumnavigateSimple;
 import org.auvua.agent.tasks.special.ResetHeading;
-import org.glassfish.tyrus.server.Server;
 import org.opencv.core.Core;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
 
 public class AUVServer {
 	private static Agent agent;
 	
 	public static void main(String args[]) {
-		System.loadLibrary( Core.NATIVE_LIBRARY_NAME );
-		
+		try {
+			System.loadLibrary( Core.NATIVE_LIBRARY_NAME);
+		} catch (UnsatisfiedLinkError e) {
+			System.err.println("Could not find resource: " + Core.NATIVE_LIBRARY_NAME);
+			System.out.println("OpenCV not found. Disabling video..");
+			Model.getInstance().setComponentValue("OpenCV", new Double(0.0));
+		}
 		Task startTask = MissionFactory.buildMission(MissionType.BUOYS_ABOVE);
 		
 		Task remoteControl = MissionFactory.buildMission(MissionType.TELEOP);
@@ -39,27 +55,31 @@ public class AUVServer {
 		agent = new Agent(remoteControl);
 		
 		new Thread(agent).start();
+		//new Thread(new HTTPCameraStream("/dev/video0", 8080)).start();
 		
-		runServer();
-	}
-	
-	public static void runServer() {
-		Server server = new Server("localhost", 8080, "", null, 
-				DashboardEndpoint.class,
-				VisionEndpoint.class, 
-				MissionEndpoint.class);
+
+		Server server = new Server();
+        SelectChannelConnector connector = new SelectChannelConnector();
+        connector.setPort(8181);
+        server.addConnector(connector);
+         
+        ResourceHandler resource_handler = new ResourceHandler();
+        resource_handler.setDirectoriesListed(false);
+        resource_handler.setWelcomeFiles(new String[]{ "index.html" });
+ 
+        resource_handler.setResourceBase("http");
+ 
+        HandlerList handlers = new HandlerList();
+        handlers.setHandlers(new Handler[] { resource_handler, new DefaultHandler() });
+        server.setHandler(handlers);
 		
 		try {
-	        server.start();
-	        
-	        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-	        System.out.println("Please press a key to stop the server.");
-	        reader.readLine();
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    } finally {
-	        server.stop();
-	    }
+			server.start();
+			server.join();
+		} catch (Exception e) {
+			System.err.println("Failed to create server instance");
+			e.printStackTrace();
+		}
 	}
 	
 }
