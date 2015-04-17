@@ -1,11 +1,15 @@
 package org.auvua.server;
 
+import org.auvua.logging.LoggingHandler;
 import org.auvua.model.Model;
 import org.auvua.vision.HTTPCameraStream;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -31,13 +35,25 @@ public class AUVServer {
 	private static Agent agent;
 	
 	public static void main(String args[]) {
+		new LoggingHandler();
+
 		try {
+			System.out.println(Core.NATIVE_LIBRARY_NAME);
 			System.loadLibrary( Core.NATIVE_LIBRARY_NAME);
 		} catch (UnsatisfiedLinkError e) {
 			System.err.println("Could not find resource: " + Core.NATIVE_LIBRARY_NAME);
-			System.out.println("OpenCV not found. Disabling video..");
-			Model.getInstance().setComponentValue("OpenCV", new Double(0.0));
+			Logger.getLogger("LUMBERJACK").severe("Failed to load OpenCV. Disabling vision.");
+			//TODO: disable video
 		}
+
+		try {
+			System.loadLibrary("jzmq");
+		} catch (UnsatisfiedLinkError e) {
+			System.err.println("Could not find resource: jzmq");
+			System.out.println("JZMQ not found. Exiting...");
+			System.exit(-1);
+		}
+
 		Task startTask = MissionFactory.buildMission(MissionType.BUOYS_ABOVE);
 		
 		Task remoteControl = MissionFactory.buildMission(MissionType.TELEOP);
@@ -56,7 +72,9 @@ public class AUVServer {
 		
 		new Thread(agent).start();
 		//new Thread(new HTTPCameraStream("/dev/video0", 8080)).start();
-		
+		LoggingEndpoint logws = new LoggingEndpoint(new InetSocketAddress(8080));
+		logws.start();
+		Logger.getLogger("LUMBERJACK").info("Logging started.");
 
 		Server server = new Server();
         SelectChannelConnector connector = new SelectChannelConnector();

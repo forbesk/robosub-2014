@@ -1,9 +1,15 @@
 package org.auvua.model;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
+import org.auvua.logging.LoggingHandler;
 import org.auvua.vision.Camera;
 import org.auvua.vision.CameraViewer;
 import org.auvua.vision.ImageFilter;
@@ -16,7 +22,8 @@ public class Model {
 	
 	private Map<String,Object> robot = new HashMap<String,Object>();
 	private Map<String,Object> cameras = new HashMap<String,Object>();
-	
+	private Queue<LogRecord> logQueue= new ConcurrentLinkedQueue<LogRecord>();
+
 	private static final Model instance = new Model();
 	private final long refreshPeriod = 20;	//req/rep update period in ms
 	private final String SOCKET_ADDRESS = "tcp://127.0.0.1:5560";
@@ -26,7 +33,6 @@ public class Model {
 	private boolean finished = false;
 	
 	public Model() {
-		
 		Map<String,Object> hardware = newMap();
 		hardware.put("surgeLeft",       ComponentFactory.create(Component.MOTOR));
 		hardware.put("surgeRight",      ComponentFactory.create(Component.MOTOR));
@@ -59,7 +65,7 @@ public class Model {
 				
 				Socket req = ctx.socket(ZMQ.REQ);
 				req.connect(SOCKET_ADDRESS);
-				
+
 				//CameraViewer frontViewer = new CameraViewer();
 				//CameraViewer bottomViewer = new CameraViewer();
 				
@@ -169,5 +175,13 @@ public class Model {
 	
 	public GyroIntegrator getGyroIntegrator() {
 		return gyroIntegrator;
+	}
+
+	public Queue<LogRecord> getLogQueue() {
+		return logQueue;
+	}
+
+	public void addLogRecord(LogRecord record) {
+		logQueue.add(record);
 	}
 }

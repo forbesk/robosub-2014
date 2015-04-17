@@ -2,6 +2,7 @@ package org.auvua.agent;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.auvua.agent.Task.TaskState;
 import org.auvua.model.Model;
@@ -10,7 +11,7 @@ public class Agent implements Runnable {
 	
 	private Task startTask;
 	private Task currentTask;
-	private boolean waitForMissionSwitch = true;
+	private boolean waitForMissionSwitch = false;
 	private List<Task> cleanedTasks = new LinkedList<Task>();
 
 	public Agent( Task startTask ) {
@@ -20,11 +21,11 @@ public class Agent implements Runnable {
 	public void run() {
 		while(true) {
 			currentTask = startTask;
-			System.out.println("Waiting for mission...");
+			Logger.getLogger("LUMBERJACK").info("Waiting for mission to start.");
 			if(waitForMissionSwitch) waitForMissionSwitch();
 			Model.getInstance().getGyroIntegrator().resetHeading();
-			
-			System.out.println("Mission started!");
+
+			Logger.getLogger("LUMBERJACK").info("Mission started!");
 			
 			//startMissionSwitchListener();
 
@@ -32,6 +33,8 @@ public class Agent implements Runnable {
 
 				Thread t = new Thread(currentTask);
 				t.start();
+
+				Logger.getLogger("LUMBERJACK").info("Task started: " + currentTask.getClass().getSimpleName());
 
 				synchronized(currentTask) {
 					if(!currentTask.isComplete()) {
@@ -42,6 +45,8 @@ public class Agent implements Runnable {
 						}
 					}
 				}
+
+				Logger.getLogger("LUMBERJACK").info("Task completed: " + currentTask.getClass().getSimpleName());
 				
 				new Thread() {
 					public void run() {
@@ -70,9 +75,9 @@ public class Agent implements Runnable {
 			}
 			
 			if(currentTask != null && currentTask.interrupted) {
-				System.out.println("Mission Interrupted!");
+				Logger.getLogger("LUMBERJACK").warning("Mission interrupted.");
 			} else {
-				System.out.println("Mission Completed!");
+				Logger.getLogger("LUMBERJACK").info("Mission complete!");
 				Model.getInstance().setComponentValue("hardware.missionComplete", 1L);
 				try {
 					Thread.sleep(3000);
